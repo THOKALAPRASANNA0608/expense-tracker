@@ -1,0 +1,107 @@
+import json
+from datetime import datetime
+
+# Function to add a new expense
+def add_expense(expenses):
+    try:
+        # User input for expense amount and description
+        amount = float(input("Enter the amount spent: "))
+        description = input("Enter a brief description of the expense: ")
+        category = input("Enter the category (e.g., food, transportation, entertainment): ")
+
+        # Create a dictionary for the expense
+        expense = {
+            'amount': amount,
+            'description': description,
+            'category': category,
+            'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        }
+
+        # Add the expense to the list
+        expenses.append(expense)
+
+        print("Expense added successfully!")
+
+    except ValueError:
+        print("Invalid input. Please enter a valid number for the amount.")
+
+# Function to view expenses by category or date
+def view_expenses(expenses):
+    try:
+        choice = input("View by (1) Category or (2) Month? Enter 1 or 2: ")
+        
+        if choice == '1':
+            category = input("Enter the category: ")
+            filtered_expenses = [exp for exp in expenses if exp['category'].lower() == category.lower()]
+            if filtered_expenses:
+                print(f"\nExpenses in category '{category}':")
+                for exp in filtered_expenses:
+                    print(f"- {exp['description']}: ${exp['amount']} on {exp['date']}")
+            else:
+                print(f"No expenses found in category '{category}'.")
+
+        elif choice == '2':
+            month = input("Enter the month (MM format): ")
+            filtered_expenses = [exp for exp in expenses if exp['date'][5:7] == month]
+            if filtered_expenses:
+                print(f"\nExpenses in month '{month}':")
+                for exp in filtered_expenses:
+                    print(f"- {exp['description']}: ${exp['amount']} on {exp['date']}")
+            else:
+                print(f"No expenses found for month '{month}'.")
+        else:
+            print("Invalid choice. Please enter 1 or 2.")
+
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+# Function to save expenses to a file
+def save_expenses(expenses, filename='expenses.json'):
+    try:
+        with open(filename, 'w') as file:
+            json.dump(expenses, file, indent=4)
+        print("Expenses saved successfully!")
+
+    except Exception as e:
+        print(f"Failed to save expenses: {e}")
+
+# Function to load expenses from a file
+def load_expenses(filename='expenses.json'):
+    try:
+        with open(filename, 'r') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return []
+    except json.JSONDecodeError:
+        print("Error decoding the expenses file.")
+        return []
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return []
+
+# Main function to run the Expense Tracker application
+def main():
+    print("Welcome to the Expense Tracker!")
+    expenses = load_expenses()
+
+    while True:
+        print("\nMenu:")
+        print("1. Add a new expense")
+        print("2. View expenses")
+        print("3. Save and exit")
+        choice = input("Enter your choice (1/2/3): ")
+
+        if choice == '1':
+            add_expense(expenses)
+        elif choice == '2':
+            view_expenses(expenses)
+        elif choice == '3':
+            save_expenses(expenses)
+            print("Goodbye!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+# Run the main function when the script is executed
+if __name__ == "__main__":
+    main()
